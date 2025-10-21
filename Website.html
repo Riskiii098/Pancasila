@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PancaConnect — Prototype Single Page</title>
+
+<!-- Google Font (bisa diganti jika offline) -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+  /* -------------------------
+     Reset & Base
+     ------------------------- */
+  :root{
+    --bg: #f7f9fc;
+    --card: #ffffff;
+    --muted: #6b7280;
+    --accent: #0f4c81; /* deep blue */
+    --accent-2: #c62828; /* red accent */
+    --success: #1e9a6c;
+    --glass: rgba(255,255,255,0.74);
+    --radius: 14px;
+    --shadow: 0 6px 20px rgba(12, 24, 48, 0.08);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg, #f3f6fb 0%, var(--bg) 100%);
+    color:#111827;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    padding:28px;
+  }
+
+  /* -------------------------
+     Layout
+     ------------------------- */
+  .container{
+    max-width:1200px;
+    margin:0 auto;
+  }
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:22px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .logo{
+    width:52px;height:52px;border-radius:10px;
+    background: linear-gradient(135deg,var(--accent),var(--accent-2));
+    display:flex;align-items:center;justify-content:center;color:white;font-weight:700;
+    box-shadow:var(--shadow);
+  }
+  .brand h1{font-size:18px;margin:0}
+  nav ul{display:flex;gap:12px;align-items:center;margin:0;padding:0;list-style:none}
+  nav a{color:var(--muted);text-decoration:none;font-weight:600;padding:8px 12px;border-radius:8px}
+  nav a.active{background:transparent;color:var(--accent)}
+  .profile-mini{display:flex;align-items:center;gap:10px}
+  .avatar{width:40px;height:40px;border-radius:10px;background:#efefef;display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:#555}
+
+  /* -------------------------
+     Grid top (cards + CTA)
+     ------------------------- */
+  .top-grid{
+    display:grid;
+    grid-template-columns: 1fr 320px;
+    gap:20px;
+    margin-bottom:22px;
+  }
+
+  /* Pancasila cards */
+  .pancasila-grid{
+    display:grid;
+    grid-template-columns: repeat(5,1fr);
+    gap:12px;
+  }
+  .sila-card{
+    background:var(--card);
+    border-radius:12px;
+    padding:12px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    box-shadow:var(--shadow);
+    min-height:120px;
+  }
+  .sila-card .title{font-weight:700;font-size:13px}
+  .sila-card .desc{font-size:12px;color:var(--muted);line-height:1.2}
+
+  .sila-1{border-left:4px solid #0f4c81}
+  .sila-2{border-left:4px solid #1e9a6c}
+  .sila-3{border-left:4px solid #c77800}
+  .sila-4{border-left:4px solid #2b6cb0}
+  .sila-5{border-left:4px solid #c62828}
+
+  /* CTA card */
+  .cta-card{
+    background:linear-gradient(180deg,#fff 0%, #fbfbff 100%);
+    border-radius:12px;padding:18px;box-shadow:var(--shadow);
+    display:flex;flex-direction:column;gap:12px;align-items:flex-start;justify-content:center;
+  }
+  .cta-card h3{margin:0;font-size:16px;color:var(--accent)}
+  .stats-row{display:flex;gap:10px;width:100%;flex-wrap:wrap}
+  .stat{background:var(--card);padding:10px;border-radius:10px;flex:1;min-width:120px;text-align:center;box-shadow:0 4px 12px rgba(15,20,30,0.04)}
+  .stat .num{font-weight:700;font-size:18px}
+  .btn-primary{
+    display:inline-flex;gap:10px;align-items:center;padding:10px 14px;border-radius:10px;background:var(--accent-2);color:white;font-weight:700;border:none;cursor:pointer;
+    box-shadow: 0 8px 24px rgba(198,40,40,0.15);
+  }
+
+  /* -------------------------
+     Main sections (cards)
+     ------------------------- */
+  .sections{
+    display:grid;
+    grid-template-columns: 1fr 360px;
+    gap:20px;
+  }
+  .left-col{display:flex;flex-direction:column;gap:16px}
+  .card{background:var(--card);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+
+  /* Edukasi */
+  .edu-list{display:grid;gap:12px}
+  .edu-item{display:flex;gap:12px;align-items:flex-start}
+  .thumb{width:110px;height:70px;border-radius:8px;background:linear-gradient(90deg,#dbeafe,#eef2ff);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#0f4c81;font-weight:700}
+  .edu-meta{flex:1}
+  .edu-meta h4{margin:0 0 6px 0;font-size:15px}
+  .edu-meta p{margin:0;font-size:13px;color:var(--muted)}
+  .filter-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .chip{padding:8px 10px;border-radius:999px;background:#f3f4f6;font-size:13px;color:#374151;cursor:pointer}
+
+  /* Komunitas */
+  .post{display:flex;gap:12px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#fff,#fbfbff)}
+  .post .post-body{flex:1}
+  .post h4{margin:0 0 6px 0;font-size:14px}
+  .post p{margin:0;color:var(--muted);font-size:13px}
+  .post .meta{font-size:12px;color:var(--muted);margin-top:8px;display:flex;gap:10px;align-items:center}
+
+  /* Aksi */
+  .action-grid{display:grid;gap:12px}
+  .action-card{display:flex;gap:12px;align-items:center;padding:12px;border-radius:10px}
+  .action-info{flex:1}
+  .progress{height:8px;background:#f3f4f6;border-radius:999px;overflow:hidden;margin-top:8px}
+  .progress > span{display:block;height:100%;background:linear-gradient(90deg,#60a5fa,#3b82f6)}
+
+  /* Right column (profile + quick actions) */
+  .right-col{display:flex;flex-direction:column;gap:12px}
+  .profile-card{text-align:center;padding-top:20px}
+  .profile-card .avatar{width:86px;height:86px;border-radius:16px;margin:0 auto 12px;background:linear-gradient(135deg,#fff,#eef2ff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)}
+  .badges{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+  .badge{padding:6px 10px;border-radius:999px;background:#f1f5f9;font-size:13px;color:#111827}
+
+  /* Floating New Post button */
+  .fab{
+    position:fixed;right:28px;bottom:28px;background:var(--accent);color:white;padding:14px;border-radius:999px;box-shadow:0 12px 30px rgba(15,76,129,0.18);border:none;cursor:pointer;font-weight:700;
+  }
+
+  /* Modal */
+  .modal{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,12,18,0.4);opacity:0;pointer-events:none;transition:opacity .18s;
+  }
+  .modal.open{opacity:1;pointer-events:auto}
+  .modal .dialog{width:min(640px,94%);background:var(--card);border-radius:12px;padding:16px;box-shadow:0 12px 40px rgba(12,20,40,0.24)}
+  .modal h3{margin:0 0 8px 0}
+  .modal .row{display:flex;gap:8px;margin-top:8px}
+
+  /* Responsive */
+  @media (max-width:1000px){
+    .top-grid{grid-template-columns:1fr}
+    .pancasila-grid{grid-template-columns:repeat(3,1fr)}
+    .sections{grid-template-columns:1fr}
+    .container{padding:0 18px}
+  }
+  @media (max-width:640px){
+    .pancasila-grid{grid-template-columns:repeat(2,1fr)}
+    nav ul{display:none}
+    header{gap:8px}
+  }
+
+  /* small helpers */
+  .muted{color:var(--muted);font-size:13px}
+  .small{font-size:13px;color:var(--muted)}
+  .gap-y{height:14px}
+  a.btn-link{color:var(--accent);text-decoration:none;font-weight:700}
+</style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- HEADER -->
+    <header>
+      <div class="brand">
+        <div class="logo">PC</div>
+        <div>
+          <h1>PancaConnect</h1>
+          <div class="small">Platform kolaborasi & edukasi nilai Pancasila</div>
+        </div>
+      </div>
+
+      <nav>
+        <ul>
+          <li><a href="#" class="active">Dashboard</a></li>
+          <li><a href="#edukasi">Edukasi</a></li>
+          <li><a href="#komunitas">Komunitas</a></li>
+          <li><a href="#aksi">Aksi Nyata</a></li>
+          <li><a href="#profil">Profil</a></li>
+        </ul>
+      </nav>
+
+      <div class="profile-mini">
+        <button title="Notifikasi" style="background:transparent;border:none;cursor:pointer;font-weight:700;color:var(--muted)">🔔</button>
+        <div class="avatar">RR</div>
+      </div>
+    </header>
+
+    <!-- TOP GRID -->
+    <section class="top-grid">
+      <div>
+        <div class="pancasila-grid">
+          <div class="sila-card sila-1">
+            <div class="title">Sila 1 - Ketuhanan</div>
+            <div class="desc">Menjunjung kebebasan beragama & rasa toleransi. Contoh: doa bersama lintas agama.</div>
+          </div>
+          <div class="sila-card sila-2">
+            <div class="title">Sila 2 - Kemanusiaan</div>
+            <div class="desc">Menjaga harkat & martabat manusia. Contoh: aksi peduli korban bencana.</div>
+          </div>
+          <div class="sila-card sila-3">
+            <div class="title">Sila 3 - Persatuan</div>
+            <div class="desc">Memperkuat kebersamaan antarwarga. Contoh: gotong royong membersihkan lingkungan.</div>
+          </div>
+          <div class="sila-card sila-4">
+            <div class="title">Sila 4 - Kerakyatan</div>
+            <div class="desc">Mengutamakan keputusan bersama & partisipasi. Contoh: musyawarah RT.</div>
+          </div>
+          <div class="sila-card sila-5">
+            <div class="title">Sila 5 - Keadilan</div>
+            <div class="desc">Menegakkan keadilan sosial untuk semua. Contoh: program bantuan pendidikan.</div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="cta-card">
+        <h3>Mulai Aksi Nyata</h3>
+        <p class="small">Bergabung dalam aksi sosial untuk menerapkan nilai Pancasila di lingkunganmu.</p>
+        <div class="stats-row">
+          <div class="stat">
+            <div class="num">20</div>
+            <div class="small">Kegiatan</div>
+          </div>
+          <div class="stat">
+            <div class="num">124</div>
+            <div class="small">Kontributor</div>
+          </div>
+          <div class="stat">
+            <div class="num">58 jam</div>
+            <div class="small">Total kontribusi</div>
+          </div>
+        </div>
+        <div style="margin-top:8px;">
+          <button class="btn-primary" id="startActionBtn">➤ Mulai Aksi Sekarang</button>
+        </div>
+      </aside>
+    </section>
+
+    <!-- MAIN SECTIONS -->
+    <section class="sections">
+      <div class="left-col">
+
+        <!-- EDUKASI -->
+        <div class="card" id="edukasi">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <h3 style="margin:0">Edukasi Pancasila</h3>
+              <div class="small">Materi singkat & kuis interaktif</div>
+            </div>
+            <a href="#" class="btn-link" onclick="openQuiz()">Ikut Kuis</a>
+          </div>
+
+          <div class="gap-y"></div>
+
+          <div class="filter-row">
+            <div class="chip">Semua</div>
+            <div class="chip">Sila 1</div>
+            <div class="chip">Sila 2</div>
+            <div class="chip">Sila 3</div>
+            <div class="chip">Sila 4</div>
+            <div class="chip">Sila 5</div>
+          </div>
+
+          <div class="edu-list">
+            <div class="edu-item">
+              <div class="thumb">S1</div>
+              <div class="edu-meta">
+                <h4>Pentingnya Toleransi Beragama</h4>
+                <p class="muted">Artikel singkat mengenai contoh implementasi sila pertama di lingkungan sekolah.</p>
+              </div>
+            </div>
+
+            <div class="edu-item">
+              <div class="thumb">S3</div>
+              <div class="edu-meta">
+                <h4>Gotong Royong: Sejarah & Praktik</h4>
+                <p class="muted">Mengenal gotong royong dan contoh kegiatan kecil yang bisa dilakukan bersama tetangga.</p>
+              </div>
+            </div>
+
+            <div class="edu-item">
+              <div class="thumb">S5</div>
+              <div class="edu-meta">
+                <h4>Keadilan Sosial untuk Semua</h4>
+                <p class="muted">Program bantuan belajar sebagai bentuk penerapan sila kelima.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- KOMUNITAS -->
+        <div class="card" id="komunitas">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <h3 style="margin:0">Komunitas</h3>
+              <div class="small">Forum untuk berbagi ide & kolaborasi</div>
+            </div>
+            <a href="#" class="btn-link" onclick="openNewPost()">Buat Post</a>
+          </div>
+
+          <div class="gap-y"></div>
+
+          <div class="post">
+            <div style="width:54px;height:54px;border-radius:10px;background:#eef2ff;display:flex;align-items:center;justify-content:center;font-weight:700;color:#0f4c81">IK</div>
+            <div class="post-body">
+              <h4>Penggalangan Buku untuk Anak Sekolah</h4>
+              <p class="muted">Ayo bergabung mengumpulkan buku bekas layak pakai untuk donasi ke desa tetangga.</p>
+              <div class="meta"><span>10 komentar</span><span> • </span><span>25 suka</span></div>
+            </div>
+          </div>
+
+          <div class="post" style="margin-top:10px">
+            <div style="width:54px;height:54px;border-radius:10px;background:#fff0f0;display:flex;align-items:center;justify-content:center;font-weight:700;color:#c62828">GR</div>
+            <div class="post-body">
+              <h4>Gotong Royong Sungai Bersih</h4>
+              <p class="muted">Rencanakan gotong royong membersihkan bantaran sungai minggu depan.</p>
+              <div class="meta"><span>8 komentar</span><span> • </span><span>31 suka</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AKSI NYATA -->
+        <div class="card" id="aksi">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <h3 style="margin:0">Aksi Nyata</h3>
+              <div class="small">Daftar kegiatan yang bisa diikuti</div>
+            </div>
+            <a href="#" class="btn-link" onclick="scrollTo('#profil')">Lihat Profil</a>
+          </div>
+
+          <div class="gap-y"></div>
+
+          <div class="action-grid">
+            <div class="action-card">
+              <div style="width:76px;height:60px;border-radius:8px;background:linear-gradient(90deg,#dcfce7,#bbf7d0);display:flex;align-items:center;justify-content:center;font-weight:700;color:#1e9a6c">Ling</div>
+              <div class="action-info">
+                <strong>Gotong Royong Lingkungan</strong>
+                <div class="small">Lokasi: RW 05 • 02 Nov 2025</div>
+                <div class="progress" aria-hidden><span style="width:60%"></span></div>
+                <div style="margin-top:8px"><button class="btn-primary" onclick="joinAction(this)">Ikut Aksi</button></div>
+              </div>
+            </div>
+
+            <div class="action-card">
+              <div style="width:76px;height:60px;border-radius:8px;background:linear-gradient(90deg,#eff6ff,#dbeafe);display:flex;align-items:center;justify-content:center;font-weight:700;color:#0f4c81">Edu</div>
+              <div class="action-info">
+                <strong>Program Bimbingan Belajar Gratis</strong>
+                <div class="small">Lokasi: Puskesmas • 10 Nov 2025</div>
+                <div class="progress" aria-hidden><span style="width:35%"></span></div>
+                <div style="margin-top:8px"><button class="btn-primary" onclick="joinAction(this)">Ikut Aksi</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <aside class="right-col">
+        <div class="card profile-card" id="profil">
+          <div class="avatar" style="width:86px;height:86px;border-radius:16px">RR</div>
+          <h3 style="margin:8px 0 4px 0">Riski Riski</h3>
+          <div class="small">Mahasiswa • Penggiat Komunitas</div>
+
+          <div style="display:flex;gap:10px;justify-content:center;margin-top:14px">
+            <div style="text-align:center">
+              <div style="font-weight:700">12</div>
+              <div class="small">Aksi</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-weight:700">340</div>
+              <div class="small">Poin</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-weight:700">48 jam</div>
+              <div class="small">Kontribusi</div>
+            </div>
+          </div>
+
+          <div class="badges" aria-hidden>
+            <div class="badge">Pejuang Gotong Royong</div>
+            <div class="badge">Teman Edukasi</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h4 style="margin:0 0 8px 0">Quick Actions</h4>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button class="btn-primary" onclick="openNewPost()" style="background:var(--accent)">+ Buat Post</button>
+            <button style="padding:10px;border-radius:8px;border:1px solid #eef2f6;background:transparent;cursor:pointer" onclick="openQuiz()">Ambil Kuis</button>
+            <button style="padding:10px;border-radius:8px;border:1px solid #eef2f6;background:transparent;cursor:pointer" onclick="scrollTo('#aksi')">Lihat Aksi</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h4 style="margin:0 0 8px 0">Tentang PancaConnect</h4>
+          <p class="muted" style="margin:0">Platform ini bertujuan menghubungkan masyarakat lewat aksi nyata & pembelajaran nilai Pancasila. Gunakan prototipe ini sebagai produk inovasi sederhana untuk tugas UTS.</p>
+        </div>
+      </aside>
+    </section>
+
+  </div>
+
+  <!-- Floating Action Button -->
+  <button class="fab" title="Buat Post" onclick="openNewPost()">+ Post</button>
+
+  <!-- MODAL: New Post -->
+  <div class="modal" id="modalNewPost" aria-hidden>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+      <h3 id="dialogTitle">Buat Post Baru</h3>
+      <p class="small">Bagikan ide aksi atau informasi komunitasmu.</p>
+      <div class="row" style="margin-top:8px">
+        <input id="postTitle" placeholder="Judul kegiatan" style="flex:1;padding:10px;border-radius:8px;border:1px solid #eef2f6" />
+      </div>
+      <div class="row" style="margin-top:8px">
+        <textarea id="postBody" placeholder="Deskripsi singkat" style="flex:1;padding:10px;border-radius:8px;border:1px solid #eef2f6;min-height:100px"></textarea>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+        <button onclick="closeNewPost()" style="padding:8px 12px;border-radius:8px;border:1px solid #eef2f6;background:transparent;cursor:pointer">Batal</button>
+        <button class="btn-primary" onclick="submitPost()">Kirim</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Quiz -->
+  <div class="modal" id="modalQuiz" aria-hidden>
+    <div class="dialog">
+      <h3>Kuis Singkat: Apa contoh gotong royong?</h3>
+      <div style="margin-top:8px">
+        <label style="display:block;margin-bottom:6px"><input type="radio" name="q1" value="a"> a) Membayar pajak sendiri</label>
+        <label style="display:block;margin-bottom:6px"><input type="radio" name="q1" value="b"> b) Membersihkan lingkungan bersama tetangga</label>
+        <label style="display:block;margin-bottom:6px"><input type="radio" name="q1" value="c"> c) Pergi liburan sendiri</label>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+        <button onclick="closeQuiz()" style="padding:8px 12px;border-radius:8px;border:1px solid #eef2f6;background:transparent;cursor:pointer">Tutup</button>
+        <button class="btn-primary" onclick="submitQuiz()">Jawab</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  /* Minimal JS untuk interaksi prototipe */
+  const modalNewPost = document.getElementById('modalNewPost');
+  const modalQuiz = document.getElementById('modalQuiz');
+
+  function openNewPost(){
+    modalNewPost.classList.add('open');
+  }
+  function closeNewPost(){
+    modalNewPost.classList.remove('open');
+    document.getElementById('postTitle').value = '';
+    document.getElementById('postBody').value = '';
+  }
+  function submitPost(){
+    const title = document.getElementById('postTitle').value.trim();
+    const body = document.getElementById('postBody').value.trim();
+    if(!title || !body){ alert('Isi judul dan deskripsi dulu.'); return; }
+    alert('Postingan berhasil dibuat (prototype). Judul: ' + title);
+    closeNewPost();
+  }
+
+  function openQuiz(){
+    modalQuiz.classList.add('open');
+  }
+  function closeQuiz(){
+    modalQuiz.classList.remove('open');
+    const inputs = document.getElementsByName('q1');
+    inputs.forEach(i => i.checked = false);
+  }
+  function submitQuiz(){
+    const ans = [...document.getElementsByName('q1')].find(i => i.checked);
+    if(!ans){ alert('Pilih jawaban dulu'); return; }
+    if(ans.value === 'b'){ alert('Benar! Gotong royong contoh: membersihkan lingkungan bersama.'); }
+    else { alert('Jawaban kurang tepat — coba lagi.'); }
+    closeQuiz();
+  }
+
+  function joinAction(btn){
+    btn.disabled = true;
+    btn.innerText = 'Terdaftar ✓';
+    btn.style.opacity = 0.9;
+  }
+
+  function scrollTo(hash){
+    const el = document.querySelector(hash);
+    if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+
+  // modal close by clicking outside
+  document.querySelectorAll('.modal').forEach(m=>{
+    m.addEventListener('click', e => {
+      if(e.target === m) m.classList.remove('open');
+    });
+  });
+
+  // start action CTA
+  document.getElementById('startActionBtn').addEventListener('click', () => {
+    scrollTo('#aksi');
+  });
+
+</script>
+</body>
+</html>
